@@ -29,7 +29,19 @@ func TestClient(t *testing.T) {
 		assert.NoError(t, c.Close(ctx))
 	}()
 
-	info, err := c.MyUserInfo(ctx)
-	require.NoError(t, err)
-	assert.NotZero(t, info)
+	t.Run("MyUserInfo", func(t *testing.T) {
+		info, err := c.MyUserInfo(ctx)
+		require.NoError(t, err)
+		assert.NotZero(t, info)
+	})
+
+	t.Run("CreateBonus", func(t *testing.T) {
+		t.Run("FailsWithBadUsername", func(t *testing.T) {
+			resp, err := c.CreateBonus(ctx, CreateBonusRequest{
+				Reason: "+1 @nonexistent fail request",
+			})
+			assert.Error(t, err)
+			assert.Zero(t, resp)
+		})
+	})
 }

@@ -5,9 +5,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/evergreen-ci/utility"
@@ -60,7 +62,7 @@ func (c *client) CreateBonus(ctx context.Context, opts CreateBonusRequest) (*Cre
 		return nil, errors.Wrap(err, "creating request body")
 	}
 
-	r, err := http.NewRequest(http.MethodPost, c.opts.BaseURL+"/bonus", body)
+	r, err := http.NewRequest(http.MethodPost, c.urlRoute("/bonuses"), body)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
@@ -102,7 +104,7 @@ func (c *client) doRequest(ctx context.Context, r *http.Request, result interfac
 }
 
 func (c *client) MyUserInfo(ctx context.Context) (*UserInfoResponse, error) {
-	r, err := http.NewRequest(http.MethodGet, c.opts.BaseURL+"/users/me", nil)
+	r, err := http.NewRequest(http.MethodGet, c.urlRoute("/users/me"), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
@@ -112,6 +114,15 @@ func (c *client) MyUserInfo(ctx context.Context) (*UserInfoResponse, error) {
 	}
 
 	return &result.Result, nil
+}
+
+func (c *client) urlRoute(parts ...string) string {
+	baseURL := strings.TrimSuffix(c.opts.BaseURL, "/")
+	if len(parts) == 0 {
+		return baseURL
+	}
+	parts[0] = strings.TrimPrefix(parts[0], "/")
+	return fmt.Sprintf("%s/%s", baseURL, path.Join(parts...))
 }
 
 func (c *client) Close(ctx context.Context) error {
