@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/evergreen-ci/utility"
-	"github.com/k0kubun/pp"
 	"github.com/mongodb/grip"
 	"github.com/pkg/errors"
 )
@@ -80,24 +79,20 @@ func (c *client) doRequest(ctx context.Context, r *http.Request, result interfac
 
 	resp, err := c.opts.HTTPClient.Do(r)
 	if err != nil {
-		pp.Println("making response")
 		return errors.Wrap(err, "executing request")
 	}
 	defer resp.Body.Close()
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		pp.Println("reading response")
 		return errors.Wrap(err, "reading response body")
 	}
 	if resp.StatusCode != http.StatusOK {
-		pp.Println("non-OK response")
 		return c.errorResponse(resp, b)
 	}
 
 	if result != nil {
 		if err := json.Unmarshal(b, &result); err != nil {
-			pp.Println("unmarshalling success result")
 			return errors.Wrap(err, "received unexpected response body")
 		}
 
@@ -109,7 +104,6 @@ func (c *client) doRequest(ctx context.Context, r *http.Request, result interfac
 func (c *client) MyUserInfo(ctx context.Context) (*UserInfoResponse, error) {
 	r, err := http.NewRequest(http.MethodGet, c.opts.BaseURL+"/users/me", nil)
 	if err != nil {
-		pp.Println("NewRequest")
 		return nil, errors.Wrap(err, "creating request")
 	}
 	var result userInfoResponseWrapper
