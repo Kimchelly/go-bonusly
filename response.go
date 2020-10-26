@@ -35,14 +35,35 @@ type userInfoResponseWrapper struct {
 }
 
 type UserInfoResponse struct {
-	ID             *string    `json:"id,omitempty"`
-	UserName       *string    `json:"username,omitempty"`
-	Email          *string    `json:"email,omitempty"`
-	FirstName      *string    `json:"first_name,omitempty"`
-	LastName       *string    `json:"last_name,omitempty"`
-	ShortName      *string    `json:"short_name,omitempty"`
-	DisplayName    *string    `json:"display_name,omitempty"`
-	Path           *string    `json:"path,omitempty"`
-	FullPictureURL *string    `json:"full_pic_url,omitempty"`
-	LastActiveAt   *time.Time `json:"last_active_at,omitempty"`
+	ID                           *string       `json:"id,omitempty"`
+	UserName                     *string       `json:"username,omitempty"`
+	Email                        *string       `json:"email,omitempty"`
+	FirstName                    *string       `json:"first_name,omitempty"`
+	LastName                     *string       `json:"last_name,omitempty"`
+	ShortName                    *string       `json:"short_name,omitempty"`
+	DisplayName                  *string       `json:"display_name,omitempty"`
+	Path                         *string       `json:"path,omitempty"`
+	FullPictureURL               *string       `json:"full_pic_url,omitempty"`
+	LastActiveAt                 *time.Time    `json:"last_active_at,omitempty"`
+	CreatedAt                    *time.Time    `json:"created_at,omitempty"`
+	ExternalUniqueID             *string       `json:"external_unique_id,omitempty"`
+	BudgetBoost                  *int          `json:"budget_boost,omitempty"`
+	UserMode                     *string       `json:"user_mode,omitempty"`
+	TimeZone                     *string       `json:"time_zone,omitempty"`
+	CanGive                      *bool         `json:"can_give,omitempty"`
+	CanReceive                   *bool         `json:"can_receive,omitempty"`
+	GiveAmounts                  *[]int        `json:"give_amounts,omitempty"`
+	Status                       *string       `json:"status,omitempty"`
+	HiredOne                     *time.Time    `json:"hired_one,omitempty"`
+	ManagerEmail                 *string       `json:"manager_email,omitempty"`
+	EarningBalance               *int          `json:"earning_balance,omitempty"`
+	EarningBalanceWithCurrency   *string       `json:"earning_balance_with_currency,omitempty"`
+	LifetimeEarnings             *int          `json:"lifetime_earnings,omitempty"`
+	LifetimeEarningsWithCurrency *string       `json:"lifetime_earnings_with_currency,omitempty"`
+	GivingBalance                *int          `json:"giving_balance,omitempty"`
+	GivingBalanceWithCurrency    *string       `json:"giving_balance_with_currency,omitempty"`
+	Department                   *string       `json:"department,omitempty"`
+	Location                     *string       `json:"location,omitempty"`
+	Number                       *string       `json:"number,omitempty"`
+	CustomProperties             []interface{} `json:"custom_properties,omitempty"`
 }
