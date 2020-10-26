@@ -144,7 +144,7 @@ func (c *client) errorResponse(resp *http.Response, body []byte) error {
 	var errResp CommonResponse
 	statusErr := errors.Errorf("status %s", resp.Status)
 	if err := json.Unmarshal(body, &errResp); err != nil {
-		return errors.Wrap(err, statusErr.Error())
+		return errors.Wrap(errors.New(string(body)), statusErr.Error())
 	}
 	if errResp.Message != nil {
 		return errors.Wrap(errors.New(*errResp.Message), statusErr.Error())

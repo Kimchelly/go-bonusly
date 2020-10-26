@@ -45,3 +45,35 @@ func TestClient(t *testing.T) {
 		})
 	})
 }
+
+func TestClientWithMockServer(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	httpClient := utility.GetHTTPClient()
+	defer utility.PutHTTPClient(httpClient)
+
+	c, err := NewClient(ClientOptions{
+		AccessToken: "access_token",
+		HTTPClient:  httpClient,
+		BaseURL:     "https://private-anon-7c8306e7d6-bonusly.apiary-mock.com/api/v1",
+	})
+	require.NoError(t, err)
+	defer func() {
+		assert.NoError(t, c.Close(ctx))
+	}()
+
+	t.Run("MyUserInfo", func(t *testing.T) {
+		info, err := c.MyUserInfo(ctx)
+		require.NoError(t, err)
+		assert.NotZero(t, info)
+	})
+
+	t.Run("CreateBonus", func(t *testing.T) {
+		t.Run("Succeeds", func(t *testing.T) {
+			resp, err := c.CreateBonus(ctx, CreateBonusRequest{})
+			require.NoError(t, err)
+			assert.NotZero(t, resp)
+		})
+	})
+}
