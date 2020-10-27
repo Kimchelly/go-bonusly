@@ -1,7 +1,5 @@
 package bonusly
 
-import "github.com/mongodb/grip"
-
 const (
 	productionBaseURL = "https://bonus.ly/api/v1"
 
@@ -16,6 +14,6 @@ type CreateBonusRequest struct {
 
 // TODO: figure out which parameters are required
 func (r *CreateBonusRequest) Validate() error {
-	catcher := grip.NewBasicCatcher()
+	catcher := newBasicCatcher()
 	return catcher.Resolve()
 }

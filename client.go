@@ -12,8 +12,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/evergreen-ci/utility"
-	"github.com/mongodb/grip"
 	"github.com/pkg/errors"
 )
 
@@ -29,10 +27,10 @@ type ClientOptions struct {
 // Validate checks that all the required fields are set and sets defaults where
 // possible.
 func (o *ClientOptions) Validate() error {
-	catcher := grip.NewBasicCatcher()
+	catcher := newBasicCatcher()
 	catcher.NewWhen(o.AccessToken == "", "must specify an access token")
 	if o.HTTPClient == nil {
-		o.HTTPClient = utility.GetDefaultHTTPRetryableClient()
+		o.HTTPClient = getDefaultHTTPRetryableClient()
 		o.defaultHTTPClient = true
 	}
 	if o.BaseURL == "" {
@@ -127,7 +125,7 @@ func (c *client) urlRoute(parts ...string) string {
 
 func (c *client) Close(ctx context.Context) error {
 	if c.opts.defaultHTTPClient {
-		utility.PutHTTPClient(c.opts.HTTPClient)
+		putHTTPClient(c.opts.HTTPClient)
 	}
 	return nil
 }

@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/evergreen-ci/utility"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,8 +16,8 @@ func TestClient(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	httpClient := utility.GetHTTPClient()
-	defer utility.PutHTTPClient(httpClient)
+	httpClient := getHTTPClient()
+	defer putHTTPClient(httpClient)
 
 	c, err := NewClient(ClientOptions{
 		AccessToken: accessToken,
@@ -50,8 +49,8 @@ func TestClientWithMockServer(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	httpClient := utility.GetHTTPClient()
-	defer utility.PutHTTPClient(httpClient)
+	httpClient := getHTTPClient()
+	defer putHTTPClient(httpClient)
 
 	c, err := NewClient(ClientOptions{
 		AccessToken: "access_token",
