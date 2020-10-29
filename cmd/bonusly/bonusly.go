@@ -9,7 +9,7 @@ import (
 
 	bonusly "github.com/kimchelly/go-bonusly"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	cli "github.com/urfave/cli/v2"
 )
 
 func main() {
