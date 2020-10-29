@@ -78,7 +78,7 @@ func createBonus() *cli.Command {
 				if err != nil {
 					return err
 				}
-				output, err := json.Marshal(resp)
+				output, err := json.MarshalIndent(resp, "", "\t")
 				if err != nil {
 					return err
 				}
@@ -106,7 +106,7 @@ func getBonus() *cli.Command {
 				if err != nil {
 					return err
 				}
-				output, err := json.Marshal(resp)
+				output, err := json.MarshalIndent(resp, "", "\t")
 				if err != nil {
 					return err
 				}
@@ -139,7 +139,7 @@ func updateBonus() *cli.Command {
 				if err != nil {
 					return err
 				}
-				output, err := json.Marshal(resp)
+				output, err := json.MarshalIndent(resp, "", "\t")
 				if err != nil {
 					return err
 				}
@@ -191,7 +191,7 @@ func myUserInfo() *cli.Command {
 				if err != nil {
 					return err
 				}
-				output, err := json.Marshal(info)
+				output, err := json.MarshalIndent(info, "", "\t")
 				if err != nil {
 					return err
 				}
