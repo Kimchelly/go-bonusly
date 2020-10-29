@@ -7,12 +7,12 @@ type CommonResponse struct {
 	Message *string `json:"message,omitempty"`
 }
 
-type createBonusResponseWrapper struct {
+type bonusResponseWrapper struct {
 	CommonResponse
-	Result CreateBonusResponse `json:"result,omitempty"`
+	Result BonusResponse `json:"result,omitempty"`
 }
 
-type CreateBonusResponse struct {
+type BonusResponse struct {
 	ID                 *string           `json:"id,omitempty"`
 	CreatedAt          *time.Time        `json:"created_at,omitempty"`
 	Reason             *string           `json:"reason,omitempty"`

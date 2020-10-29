@@ -54,7 +54,7 @@ func NewClient(opts ClientOptions) (Client, error) {
 	}, nil
 }
 
-func (c *client) CreateBonus(ctx context.Context, opts CreateBonusRequest) (*CreateBonusResponse, error) {
+func (c *client) CreateBonus(ctx context.Context, opts CreateBonusRequest) (*BonusResponse, error) {
 	body, err := c.makeBody(opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request body")
@@ -65,12 +65,81 @@ func (c *client) CreateBonus(ctx context.Context, opts CreateBonusRequest) (*Cre
 		return nil, errors.Wrap(err, "creating request")
 	}
 
-	var result createBonusResponseWrapper
+	var result bonusResponseWrapper
 	if err := c.doRequest(ctx, r, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	return &result.Result, nil
+}
+
+func (c *client) GetBonus(ctx context.Context, id string) (*BonusResponse, error) {
+	r, err := http.NewRequest(http.MethodGet, c.urlRoute("/bonuses", id), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating request")
+	}
+
+	var result bonusResponseWrapper
+	if err := c.doRequest(ctx, r, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &result.Result, nil
+}
+
+func (c *client) UpdateBonus(ctx context.Context, id, reason string) (*BonusResponse, error) {
+	payload := CreateBonusRequest{
+		Reason: reason,
+	}
+	body, err := c.makeBody(payload)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating request body")
+	}
+
+	r, err := http.NewRequest(http.MethodPut, c.urlRoute("/bonuses", id), body)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating request")
+	}
+
+	var result bonusResponseWrapper
+	if err := c.doRequest(ctx, r, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &result.Result, nil
+}
+
+func (c *client) DeleteBonus(ctx context.Context, id string) error {
+	r, err := http.NewRequest(http.MethodDelete, c.urlRoute("/bonuses", id), nil)
+	if err != nil {
+		return errors.Wrap(err, "creating request")
+	}
+
+	if err := c.doRequest(ctx, r, nil); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+func (c *client) MyUserInfo(ctx context.Context) (*UserInfoResponse, error) {
+	r, err := http.NewRequest(http.MethodGet, c.urlRoute("/users/me"), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating request")
+	}
+	var result userInfoResponseWrapper
+	if err := c.doRequest(ctx, r, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &result.Result, nil
+}
+
+func (c *client) Close(_ context.Context) error {
+	if c.opts.defaultHTTPClient {
+		putHTTPClient(c.opts.HTTPClient)
+	}
+	return nil
 }
 
 func (c *client) doRequest(ctx context.Context, r *http.Request, result interface{}) error {
@@ -95,23 +164,9 @@ func (c *client) doRequest(ctx context.Context, r *http.Request, result interfac
 		if err := json.Unmarshal(b, &result); err != nil {
 			return errors.Wrap(err, "received unexpected response body")
 		}
-
 	}
 
 	return nil
-}
-
-func (c *client) MyUserInfo(ctx context.Context) (*UserInfoResponse, error) {
-	r, err := http.NewRequest(http.MethodGet, c.urlRoute("/users/me"), nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating request")
-	}
-	var result userInfoResponseWrapper
-	if err := c.doRequest(ctx, r, &result); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &result.Result, nil
 }
 
 func (c *client) urlRoute(parts ...string) string {
@@ -121,13 +176,6 @@ func (c *client) urlRoute(parts ...string) string {
 	}
 	parts[0] = strings.TrimPrefix(parts[0], "/")
 	return fmt.Sprintf("%s/%s", baseURL, path.Join(parts...))
-}
-
-func (c *client) Close(ctx context.Context) error {
-	if c.opts.defaultHTTPClient {
-		putHTTPClient(c.opts.HTTPClient)
-	}
-	return nil
 }
 
 func (c *client) makeBody(payload interface{}) (io.Reader, error) {

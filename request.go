@@ -11,9 +11,3 @@ type CreateBonusRequest struct {
 	Reason        string `json:"reason,omitempty"`
 	ParentBonusID string `json:"parent_bonus_id,omitempty"`
 }
-
-// TODO: figure out which parameters are required
-func (r *CreateBonusRequest) Validate() error {
-	catcher := newBasicCatcher()
-	return catcher.Resolve()
-}
