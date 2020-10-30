@@ -28,19 +28,43 @@ func TestClient(t *testing.T) {
 		assert.NoError(t, c.Close(ctx))
 	}()
 
-	t.Run("MyUserInfo", func(t *testing.T) {
-		info, err := c.MyUserInfo(ctx)
-		require.NoError(t, err)
-		assert.NotZero(t, info)
-	})
-
 	t.Run("CreateBonus", func(t *testing.T) {
-		t.Run("FailsWithBadUsername", func(t *testing.T) {
+		t.Run("FailsWithBadInput", func(t *testing.T) {
 			resp, err := c.CreateBonus(ctx, CreateBonusRequest{
 				Reason: "+1 @nonexistent fail request",
 			})
 			assert.Error(t, err)
 			assert.Zero(t, resp)
+		})
+	})
+	t.Run("ListBonuses", func(t *testing.T) {
+		t.Run("Succeeds", func(t *testing.T) {
+			resp, err := c.ListBonuses(ctx, ListBonusesRequest{
+				Limit: 1,
+			})
+			require.NoError(t, err)
+			assert.NotZero(t, resp)
+		})
+		t.Run("FailsWithBadInput", func(t *testing.T) {
+			resp, err := c.ListBonuses(ctx, ListBonusesRequest{
+				GiverEmail: "nonexistent",
+			})
+			require.NoError(t, err)
+			assert.NotZero(t, resp)
+		})
+	})
+	t.Run("ListRewards", func(t *testing.T) {
+		t.Run("Succeeds", func(t *testing.T) {
+			resp, err := c.ListRewards(ctx, ListRewardsRequest{})
+			require.NoError(t, err)
+			assert.NotZero(t, resp)
+		})
+	})
+	t.Run("MyUserInfo", func(t *testing.T) {
+		t.Run("Succeeds", func(t *testing.T) {
+			info, err := c.MyUserInfo(ctx)
+			require.NoError(t, err)
+			assert.NotZero(t, info)
 		})
 	})
 }
@@ -62,17 +86,35 @@ func TestClientWithMockServer(t *testing.T) {
 		assert.NoError(t, c.Close(ctx))
 	}()
 
-	t.Run("MyUserInfo", func(t *testing.T) {
-		info, err := c.MyUserInfo(ctx)
-		require.NoError(t, err)
-		assert.NotZero(t, info)
-	})
-
 	t.Run("CreateBonus", func(t *testing.T) {
 		t.Run("Succeeds", func(t *testing.T) {
 			resp, err := c.CreateBonus(ctx, CreateBonusRequest{})
 			require.NoError(t, err)
 			assert.NotZero(t, resp)
 		})
+	})
+	// For some reason, the mock server does not include the CommonResponse and
+	// just lists the mock bonuses/reward, which differs from responses from the
+	// production server.
+	// t.Run("ListRewards", func(t *testing.T) {
+	//     t.Run("Succeeds", func(t *testing.T) {
+	//         resp, err := c.ListRewards(ctx, ListRewardsRequest{})
+	//         require.NoError(t, err)
+	//         assert.NotZero(t, resp)
+	//     })
+	// })
+	// t.Run("ListBonuses", func(t *testing.T) {
+	//     t.Run("Succeeds", func(t *testing.T) {
+	//         resp, err := c.ListBonuses(ctx, ListBonusesRequest{
+	//             Limit: 1,
+	//         })
+	//         require.NoError(t, err)
+	//         assert.NotZero(t, resp)
+	//     })
+	// })
+	t.Run("MyUserInfo", func(t *testing.T) {
+		info, err := c.MyUserInfo(ctx)
+		require.NoError(t, err)
+		assert.NotZero(t, info)
 	})
 }

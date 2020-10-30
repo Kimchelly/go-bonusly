@@ -10,11 +10,17 @@ type MockClient struct {
 	GetBonusID       string
 	GetBonusResponse BonusResponse
 
+	ListBonusesRequest  ListBonusesRequest
+	ListBonusesResponse []BonusResponse
+
 	UpdateBonusID       string
 	UpdateBonusReason   string
 	UpdateBonusResponse BonusResponse
 
 	DeleteBonusID string
+
+	ListRewardsRequest  ListRewardsRequest
+	ListRewardsResponse []RewardsResponse
 
 	MyUserInfoResponse UserInfoResponse
 }
@@ -26,14 +32,21 @@ func (c *MockClient) CreateBonus(_ context.Context, req CreateBonusRequest) (*Bo
 	return &c.CreateBonusResponse, nil
 }
 
-// CreateBonus records the bonus ID input and returns the mock client's
+// GetBonus records the bonus ID input and returns the mock client's
 // GetBonusResponse.
 func (c *MockClient) GetBonus(_ context.Context, id string) (*BonusResponse, error) {
 	c.GetBonusID = id
 	return &c.GetBonusResponse, nil
 }
 
-// CreateBonus records the bonus ID input and reason and returns the mock
+// ListBonuses records the ListBonusesRequest input and returns the mock
+// client's ListBonusesResponse.
+func (c *MockClient) ListBonuses(_ context.Context, req ListBonusesRequest) ([]BonusResponse, error) {
+	c.ListBonusesRequest = req
+	return c.ListBonusesResponse, nil
+}
+
+// UpdateBonus records the bonus ID input and reason and returns the mock
 // client's UpdateBonusResponse.
 func (c *MockClient) UpdateBonus(_ context.Context, id, reason string) (*BonusResponse, error) {
 	c.UpdateBonusID = id
@@ -45,6 +58,13 @@ func (c *MockClient) UpdateBonus(_ context.Context, id, reason string) (*BonusRe
 func (c *MockClient) DeleteBonus(_ context.Context, id string) error {
 	c.DeleteBonusID = id
 	return nil
+}
+
+// ListRewards records the ListRewardsRequest input and returns the mock
+// client's ListRewardsResponse.
+func (c *MockClient) ListRewards(_ context.Context, req ListRewardsRequest) ([]RewardsResponse, error) {
+	c.ListRewardsRequest = req
+	return c.ListRewardsResponse, nil
 }
 
 // MyUserInfo returns the mock client's MyUserInfoResponse.

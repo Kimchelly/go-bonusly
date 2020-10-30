@@ -60,13 +60,13 @@ func (c *client) CreateBonus(ctx context.Context, opts CreateBonusRequest) (*Bon
 		return nil, errors.Wrap(err, "creating request body")
 	}
 
-	r, err := http.NewRequest(http.MethodPost, c.urlRoute("/bonuses"), body)
+	r, err := http.NewRequestWithContext(ctx, http.MethodPost, c.urlRoute("/bonuses"), body)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
 
 	var result bonusResponseWrapper
-	if err := c.doRequest(ctx, r, &result); err != nil {
+	if err := c.doRequest(r, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -74,17 +74,36 @@ func (c *client) CreateBonus(ctx context.Context, opts CreateBonusRequest) (*Bon
 }
 
 func (c *client) GetBonus(ctx context.Context, id string) (*BonusResponse, error) {
-	r, err := http.NewRequest(http.MethodGet, c.urlRoute("/bonuses", id), nil)
+	r, err := http.NewRequestWithContext(ctx, http.MethodGet, c.urlRoute("/bonuses", id), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
 
 	var result bonusResponseWrapper
-	if err := c.doRequest(ctx, r, &result); err != nil {
+	if err := c.doRequest(r, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	return &result.Result, nil
+}
+
+func (c *client) ListBonuses(ctx context.Context, req ListBonusesRequest) ([]BonusResponse, error) {
+	r, err := http.NewRequestWithContext(ctx, http.MethodGet, c.urlRoute("/bonuses"), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating request")
+	}
+	q := r.URL.Query()
+	for k, v := range req.QueryMap() {
+		q.Set(k, v)
+	}
+	r.URL.RawQuery = q.Encode()
+
+	var result bonusesResponseWrapper
+	if err := c.doRequest(r, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return result.Result, nil
 }
 
 func (c *client) UpdateBonus(ctx context.Context, id, reason string) (*BonusResponse, error) {
@@ -96,13 +115,13 @@ func (c *client) UpdateBonus(ctx context.Context, id, reason string) (*BonusResp
 		return nil, errors.Wrap(err, "creating request body")
 	}
 
-	r, err := http.NewRequest(http.MethodPut, c.urlRoute("/bonuses", id), body)
+	r, err := http.NewRequestWithContext(ctx, http.MethodPut, c.urlRoute("/bonuses", id), body)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
 
 	var result bonusResponseWrapper
-	if err := c.doRequest(ctx, r, &result); err != nil {
+	if err := c.doRequest(r, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -110,25 +129,43 @@ func (c *client) UpdateBonus(ctx context.Context, id, reason string) (*BonusResp
 }
 
 func (c *client) DeleteBonus(ctx context.Context, id string) error {
-	r, err := http.NewRequest(http.MethodDelete, c.urlRoute("/bonuses", id), nil)
+	r, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.urlRoute("/bonuses", id), nil)
 	if err != nil {
 		return errors.Wrap(err, "creating request")
 	}
 
-	if err := c.doRequest(ctx, r, nil); err != nil {
+	if err := c.doRequest(r, nil); err != nil {
 		return errors.WithStack(err)
 	}
 
 	return nil
 }
 
+func (c *client) ListRewards(ctx context.Context, req ListRewardsRequest) ([]RewardsResponse, error) {
+	r, err := http.NewRequestWithContext(ctx, http.MethodGet, c.urlRoute("/rewards"), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating request")
+	}
+	q := r.URL.Query()
+	for k, v := range req.QueryMap() {
+		q.Set(k, v)
+	}
+	r.URL.RawQuery = q.Encode()
+
+	var result rewardsResponseWrapper
+	if err := c.doRequest(r, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result.Result, nil
+}
+
 func (c *client) MyUserInfo(ctx context.Context) (*UserInfoResponse, error) {
-	r, err := http.NewRequest(http.MethodGet, c.urlRoute("/users/me"), nil)
+	r, err := http.NewRequestWithContext(ctx, http.MethodGet, c.urlRoute("/users/me"), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
 	var result userInfoResponseWrapper
-	if err := c.doRequest(ctx, r, &result); err != nil {
+	if err := c.doRequest(r, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -142,9 +179,8 @@ func (c *client) Close(_ context.Context) error {
 	return nil
 }
 
-func (c *client) doRequest(ctx context.Context, r *http.Request, result interface{}) error {
+func (c *client) doRequest(r *http.Request, result interface{}) error {
 	c.addHeaders(r)
-	r = r.WithContext(ctx)
 
 	resp, err := c.opts.HTTPClient.Do(r)
 	if err != nil {

@@ -12,6 +12,11 @@ type bonusResponseWrapper struct {
 	Result BonusResponse `json:"result,omitempty"`
 }
 
+type bonusesResponseWrapper struct {
+	CommonResponse
+	Result []BonusResponse `json:"result,omitempty"`
+}
+
 type BonusResponse struct {
 	ID                 *string           `json:"id,omitempty"`
 	CreatedAt          *time.Time        `json:"created_at,omitempty"`
@@ -24,9 +29,42 @@ type BonusResponse struct {
 	Receiver           *UserInfoResponse `json:"receiver,omitempty"`
 	ChildCount         *int              `json:"child_count,omitempty"`
 	// TODO: figure out what the expected structure of this is.
-	ChildBonuses []interface{} `json:"child_bonuses,omitempty"`
-	Via          *string       `json:"via,omitempty"`
-	FamilyAmount *int          `json:"family_amount,omitempty"`
+	ChildBonuses []BonusResponse `json:"child_bonuses,omitempty"`
+	Via          *string         `json:"via,omitempty"`
+	FamilyAmount *int            `json:"family_amount,omitempty"`
+}
+
+type rewardsResponseWrapper struct {
+	CommonResponse
+	Result []RewardsResponse `json:"result,omitempty"`
+}
+
+type RewardsResponse struct {
+	Type    string           `json:"type,omitempty"`
+	Name    string           `json:"name,omitempty"`
+	Rewards []RewardResponse `json:"rewards,omitempty"`
+}
+
+type RewardResponse struct {
+	Name                string                        `json:"name,omitempty"`
+	ImageURL            string                        `json:"image_url,omitempty"`
+	MinimumDisplayPrice string                        `json:"minimum_display_price,omitempty"`
+	Description         RewardDescriptionResponse     `json:"description,omitempty"`
+	DisclaimerHTML      string                        `json:"disclaimer_html,omitempty"`
+	Categories          []string                      `json:"categories,omitempty"`
+	Denominations       []RewardDenominationsResponse `json:"denominations,omitempty"`
+}
+
+type RewardDescriptionResponse struct {
+	Text string `json:"text,omitempty"`
+	HTML string `json:"html,omitempty"`
+}
+
+type RewardDenominationsResponse struct {
+	ID           string `json:"id,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Price        int    `json:"price,omitempty"`
+	DisplayPrice string `json:"display_price,omitempty"`
 }
 
 type userInfoResponseWrapper struct {
